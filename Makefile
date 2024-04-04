@@ -27,3 +27,20 @@ cluster-start: ## k3d cluster start
 cluster-stop: ## k3d cluster stop
 	@k3d cluster stop $(filter-out $@,$(MAKECMDGOALS))
 
+
+### Dev
+.PHONY: demo-init demo-check demo-clean
+demo-init: ## Init demo cluster (my-cluster)
+	k3d cluster create my-cluster --port 8080:80@loadbalancer
+	sleep 1
+	kubectl apply -f kubernetes/deployment.yaml
+	sleep 10
+	kubectl get pods --output wide
+	kubectl get ingress --output wide
+	kubectl get services --output wide
+	
+demo-check: ## Check it (my-cluster)
+	curl http://hostname.127.0.0.1.nip.io:8080
+
+demo-clean: ## Clean (remove) demo cluster (my-cluster)
+	k3d cluster delete my-cluster
