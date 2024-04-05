@@ -1,5 +1,5 @@
 
-APP_CLUSTER_NAME=my-cluster
+APP_CLUSTER_NAME=dev-cluster
 
 .DEFAULT_GOAL = help
 
@@ -30,11 +30,18 @@ k3d-cluster-stop: ## k3d cluster stop
 	@k3d cluster stop $(filter-out $@,$(MAKECMDGOALS))
 
 ### App cluster
-.PHONY: cluster-init cluster-check cluster-clean
+.PHONY: cluster-init cluster-check cluster-delete cluster-list
 cluster-init: ## Init cluster
 	@echo "Init cluster: $(APP_CLUSTER_NAME)"
 	# k3d cluster create $(APP_CLUSTER_NAME) --port 8080:80@loadbalancer
 	k3d cluster create --config kubernetes/cluster.yaml
+
+cluster-delete: ## Delete cluster
+	@echo "Delete cluster: $(APP_CLUSTER_NAME)"
+	k3d cluster delete $(APP_CLUSTER_NAME)
+
+cluster-list: ## List clusters
+	k3d cluster list
 
 cluster-check: ## Check cluster
 	@echo "Check cluster: $(APP_CLUSTER_NAME)"
@@ -45,10 +52,6 @@ cluster-check: ## Check cluster
 	@echo "------------------------------"
 	kubectl get services --output wide
 	@echo "------------------------------"
-
-cluster-clean: ## Clean (remove) cluster
-	@echo "Delete cluster: $(APP_CLUSTER_NAME)"
-	k3d cluster delete $(APP_CLUSTER_NAME)
 
 ### Apps
 # https://containers.fan/posts/using-k3d-to-run-development-kubernetes-clusters/
@@ -62,5 +65,9 @@ app-hostname-delete: ## Delete app: hostname
 	kubectl delete services hostname-service
 	
 app-hostname-ping: ## Ping 
-	curl http://hostname.127.0.0.1.nip.io:8080
+	curl http://hostname.127.0.0.1.nip.io:80
 
+
+.PHONY: app-debian-deploy
+app-debian-deploy: ## Deploy app: debian
+	kubectl apply -f deployments/debian/deployment.yaml

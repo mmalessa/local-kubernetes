@@ -1,0 +1,23 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: debian
+  name: debian
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: debian
+  template:
+    metadata:
+      labels:
+        app: debian
+    spec:
+      containers:
+      - name: debian
+        image: debian:bullseye-slim
+        imagePullPolicy: IfNotPresent
+        command: ["tail"]
+        args: ["-f", ">", "/dev/null"]

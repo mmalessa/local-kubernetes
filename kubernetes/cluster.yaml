@@ -1,7 +1,7 @@
 apiVersion: k3d.io/v1alpha5
 kind: Simple
 metadata:
-  name: containers-fan-cluster2
+  name: dev-cluster
 servers: 1
 agents: 2
 kubeAPI:
@@ -10,7 +10,13 @@ kubeAPI:
   hostPort: "6445"
 image: rancher/k3s:v1.28.8-k3s1
 ports:
-  - port: 8080:80
+  - port: 80:80
+    nodeFilters:
+      - loadbalancer
+  - port: 8080:8080
+    nodeFilters:
+      - loadbalancer
+  - port: 8081:8081
     nodeFilters:
       - loadbalancer
 options:
