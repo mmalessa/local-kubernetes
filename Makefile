@@ -1,4 +1,6 @@
 
+APP_CLUSTER_NAME=my-cluster
+
 .DEFAULT_GOAL = help
 
 %:
@@ -15,32 +17,50 @@ stuff-install: ## Install needed stuff
 	@cd scripts && sudo ./stuff-install.sh
 
 ### K3D shortcuts
-.PHONY: cluster-list cluster-create cluster-delete cluster-stop cluster-start
-cluster-list: ## k3d cluster list
+.PHONY: k3d-cluster-list k3d-cluster-create k3d-cluster-delete k3d-cluster-stop k3d-cluster-start
+k3d-cluster-list: ## k3d cluster list
 	@k3d cluster list
-cluster-create: ## k3d cluster create
+k3d-cluster-create: ## k3d cluster create
 	@k3d cluster create $(filter-out $@,$(MAKECMDGOALS))
-cluster-delete: ## k3d cluster delete
+k3d-cluster-delete: ## k3d cluster delete
 	@k3d cluster delete $(filter-out $@,$(MAKECMDGOALS))
-cluster-start: ## k3d cluster start
+k3d-cluster-start: ## k3d cluster start
 	@k3d cluster start $(filter-out $@,$(MAKECMDGOALS))
-cluster-stop: ## k3d cluster stop
+k3d-cluster-stop: ## k3d cluster stop
 	@k3d cluster stop $(filter-out $@,$(MAKECMDGOALS))
 
+### App cluster
+.PHONY: cluster-init cluster-check cluster-clean
+cluster-init: ## Init cluster
+	@echo "Init cluster: $(APP_CLUSTER_NAME)"
+	# k3d cluster create $(APP_CLUSTER_NAME) --port 8080:80@loadbalancer
+	k3d cluster create --config kubernetes/cluster.yaml
 
-### Dev
-.PHONY: demo-init demo-check demo-clean
-demo-init: ## Init demo cluster (my-cluster)
-	k3d cluster create my-cluster --port 8080:80@loadbalancer
-	sleep 1
-	kubectl apply -f kubernetes/deployment.yaml
-	sleep 10
+cluster-check: ## Check cluster
+	@echo "Check cluster: $(APP_CLUSTER_NAME)"
+	@echo "------------------------------"
 	kubectl get pods --output wide
+	@echo "------------------------------"
 	kubectl get ingress --output wide
+	@echo "------------------------------"
 	kubectl get services --output wide
+	@echo "------------------------------"
+
+cluster-clean: ## Clean (remove) cluster
+	@echo "Delete cluster: $(APP_CLUSTER_NAME)"
+	k3d cluster delete $(APP_CLUSTER_NAME)
+
+### Apps
+# https://containers.fan/posts/using-k3d-to-run-development-kubernetes-clusters/
+.PHONY: app-hostname-deploy app-hostname-ping
+app-hostname-deploy: ## Deploy app: hostname
+	kubectl apply -f deployments/hostname-app/deployment.yaml
+
+app-hostname-delete: ## Delete app: hostname
+	kubectl delete deployment hostname
+	kubectl delete ingress hostname-ingress
+	kubectl delete services hostname-service
 	
-demo-check: ## Check it (my-cluster)
+app-hostname-ping: ## Ping 
 	curl http://hostname.127.0.0.1.nip.io:8080
 
-demo-clean: ## Clean (remove) demo cluster (my-cluster)
-	k3d cluster delete my-cluster
