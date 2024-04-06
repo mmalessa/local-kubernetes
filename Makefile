@@ -30,8 +30,8 @@ k3d-cluster-stop: ## k3d cluster stop
 	@k3d cluster stop $(filter-out $@,$(MAKECMDGOALS))
 
 ### App cluster
-.PHONY: cluster-init cluster-check cluster-delete cluster-list
-cluster-init: ## Init cluster
+.PHONY: cluster-create cluster-delete cluster-list cluster-info
+cluster-create: ## Create cluster
 	@echo "Init cluster: $(APP_CLUSTER_NAME)"
 	# k3d cluster create $(APP_CLUSTER_NAME) --port 8080:80@loadbalancer
 	k3d cluster create --config kubernetes/cluster.yaml
@@ -43,7 +43,7 @@ cluster-delete: ## Delete cluster
 cluster-list: ## List clusters
 	k3d cluster list
 
-cluster-check: ## Check cluster
+cluster-info: ## Check cluster
 	@echo "Check cluster: $(APP_CLUSTER_NAME)"
 	@echo "------------------------------"
 	kubectl get pods --output wide
