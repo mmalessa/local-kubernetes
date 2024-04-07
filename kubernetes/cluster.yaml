@@ -8,8 +8,8 @@ kubeAPI:
   host: "master.127.0.0.1.nip.io"
   hostIP: "127.0.0.1"
   hostPort: "6445"
-# image: rancher/k3s:v1.28.8-k3s1
-image: 'docker.io/rancher/k3s:v1.27.4-k3s1'
+image: 'docker.io/rancher/k3s:v1.28.8-k3s1'
+#image: 'docker.io/rancher/k3s:v1.27.4-k3s1'
 ports:
   - port: 80:80
     nodeFilters:
@@ -23,7 +23,7 @@ ports:
 options:
   k3d:
     wait: true
-    timeout: "60s"
+    timeout: "180s"
   k3s:
     extraArgs:
       - arg: --tls-san=127.0.0.1.nip.io
