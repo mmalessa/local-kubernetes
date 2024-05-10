@@ -9,15 +9,8 @@ kubeAPI:
   hostIP: "127.0.0.1"
   hostPort: "6445"
 image: 'docker.io/rancher/k3s:v1.28.8-k3s1'
-#image: 'docker.io/rancher/k3s:v1.27.4-k3s1'
 ports:
   - port: 80:80
-    nodeFilters:
-      - loadbalancer
-  - port: 8080:8080
-    nodeFilters:
-      - loadbalancer
-  - port: 8081:8081
     nodeFilters:
       - loadbalancer
 options:

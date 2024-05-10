@@ -33,7 +33,6 @@ k3d-cluster-stop: ## k3d cluster stop
 .PHONY: cluster-create cluster-delete cluster-list cluster-info
 cluster-create: ## Create cluster
 	@echo "Init cluster: $(APP_CLUSTER_NAME)"
-	# k3d cluster create $(APP_CLUSTER_NAME) --port 8080:80@loadbalancer
 	k3d cluster create --config kubernetes/cluster.yaml
 
 cluster-delete: ## Delete cluster
@@ -46,12 +45,7 @@ cluster-list: ## List clusters
 cluster-info: ## Check cluster
 	@echo "Check cluster: $(APP_CLUSTER_NAME)"
 	@echo "------------------------------"
-	kubectl get pods --output wide
-	@echo "------------------------------"
-	kubectl get ingress --output wide
-	@echo "------------------------------"
-	kubectl get services --output wide
-	@echo "------------------------------"
+	kubectl get pods,ingress,services --output wide
 
 ### Apps
 # https://containers.fan/posts/using-k3d-to-run-development-kubernetes-clusters/

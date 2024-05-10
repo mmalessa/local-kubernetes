@@ -4,4 +4,15 @@ See `Makefile` content ...or `make help`
 
 # GUI
 ## hostname
-http://hostname.127.0.0.1.nip.io
+http://hostname.localhost
+
+
+
+# Notes
+```shell
+kubectl create deployment nginx --image=nginx:latest --port 80
+kubectl expose deployment nginx --port 80
+kubectl get svc,po
+kubectl create ingress nginx --rule="nginx.localhost/=nginx:80"
+kubectl get ingress
+```
