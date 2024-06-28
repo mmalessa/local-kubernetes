@@ -1,5 +1,5 @@
-
 APP_CLUSTER_NAME=dev-cluster
+DC = docker compose
 
 .DEFAULT_GOAL = help
 
@@ -15,6 +15,15 @@ help: ## Help
 .PHONY: stuff-install
 stuff-install: ## Install needed stuff
 	@cd scripts && sudo ./stuff-install.sh
+
+### Image Registry
+.PHONY: up
+up:
+	$(DC) up -d
+
+.PHONY: down
+down:
+	$(DC) down
 
 ### K3D shortcuts
 .PHONY: k3d-cluster-list k3d-cluster-create k3d-cluster-delete k3d-cluster-stop k3d-cluster-start
