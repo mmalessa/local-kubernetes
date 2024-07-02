@@ -40,3 +40,10 @@ else
   curl -s -L -o devspace "https://github.com/loft-sh/devspace/releases/latest/download/devspace-linux-amd64" \
     && sudo install -c -m 0755 devspace /usr/local/bin && rm ./devspace
 fi
+
+# Helm
+if [ -x "$(command -v helm)" ]; then
+  echo "helm found"
+else
+  curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
+fi

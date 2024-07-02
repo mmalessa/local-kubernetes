@@ -16,3 +16,8 @@ kubectl get svc,po
 kubectl create ingress nginx --rule="nginx.localhost/=nginx:80"
 kubectl get ingress
 ```
+
+```shell
+helm create mychart
+helm install myapp ./mychart
+```
