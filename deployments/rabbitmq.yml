@@ -1,0 +1,149 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: rabbitmq-secret
+  labels:
+    app: rabbitmq
+data:
+  RABBITMQ_DEFAULT_USER: user
+  RABBITMQ_DEFAULT_PASS: user
+  RABBITMQ_NODENAME: demo@rabbitmq
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: rabbitmq-config
+data:
+  enabled_plugins: |
+    [rabbitmq_management].
+  rabbitmq.conf: |
+    # listeners.ssl.default = 5671
+    listeners.tcp.default = 5672
+    management.listener.port = 15672
+    loopback_users.guest = false
+    default_user = developer
+    default_pass = developer
+    cluster_formation.peer_discovery_backend = rabbit_peer_discovery_k8s
+    cluster_formation.k8s.host = kubernetes.default.svc.cluster.local
+    cluster_formation.node_cleanup.interval = 10
+    cluster_formation.node_cleanup.only_log_warning = true
+    cluster_partition_handling = autoheal
+    queue_master_locator = min-masters
+    # ssl_options.cacertfile = /etc/certs/ca_certificate.pem
+    # ssl_options.certfile   = /etc/certs/server_certificate.pem
+    # ssl_options.keyfile    = /etc/certs/server_key.pem
+    # ssl_options.verify     = verify_peer
+    # ssl_options.fail_if_no_peer_cert = false
+#    log.file.level         = debug
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: rabbitmq-certs
+  labels:
+    app: rabbitmq
+data:
+  ca_certificate.pem: |
+    -----BEGIN CERTIFICATE-----
+    -----END CERTIFICATE-----
+  server_certificate.pem: |
+    -----BEGIN CERTIFICATE-----
+    -----END CERTIFICATE-----
+  server_key.pem: |
+    -----BEGIN PRIVATE KEY-----
+    -----END PRIVATE KEY-----
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: rabbitmq-volume
+  labels:
+    type: local
+    app: rabbitmq
+spec:
+  storageClassName: manual
+  capacity:
+    storage: 10Gi
+  accessModes:
+    - ReadWriteMany
+  hostPath:
+    path: /data/rabbitmq
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: rabbitmq-volume-claim
+  labels:
+    app: rabbitmq
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 10Gi
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: rabbitmq
+spec:
+  serviceName: "rabbitmq"
+  replicas: 1
+  selector:
+    matchLabels:
+      app: rabbitmq
+  template:
+    metadata:
+      labels:
+        app: rabbitmq
+    spec:
+      containers:
+        - name: rabbitmq
+          image: rabbitmq:3.13.1-management
+          env:
+            - name: RABBITMQ_USE_LONGNAME
+              value: "true"
+            - name: K8S_SERVICE_NAME
+              value: "rabbitmq"
+          ports:
+            - containerPort: 5671
+            - containerPort: 5672
+            - containerPort: 15672
+          volumeMounts:
+            - name: rabbitmqdata
+              mountPath: /var/lib/rabbitmq/mnesia
+            - name: rabbitmqconfig
+              mountPath: /etc/rabbitmq
+            - name: rabbitmqcerts
+              mountPath: /etc/certs
+      volumes:
+        - name: rabbitmqdata
+          persistentVolumeClaim:
+            claimName: rabbitmq-volume-claim
+        - name: rabbitmqconfig
+          configMap:
+            name: rabbitmq-config
+        - name: rabbitmqcerts
+          configMap:
+            name: rabbitmq-certs
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: rabbitmq
+  labels:
+    app: rabbitmq
+spec:
+  type: NodePort
+  ports:
+    - port: 5671
+      targetPort: 5671
+      name: rabbitmq-ssl
+    - port: 5672
+      targetPort: 5672
+      name: rabbitmq-plain
+    - port: 15672
+      targetPort: 15672
+      name: rabbitmq-gui
+  selector:
+    app: rabbitmq
