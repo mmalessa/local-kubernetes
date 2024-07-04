@@ -22,6 +22,20 @@ else
      && chmod +x /usr/local/bin/kubectl
 fi
 
+if [ -x "$(command -v kubectx)" ]; then
+  echo "kubectx found"
+else
+  sudo curl -Lo /usr/local/bin/kubectx https://github.com/ahmetb/kubectx/releases/latest/download/kubectx
+  sudo chmod +x /usr/local/bin/kubectx
+fi
+
+if [ -x "$(command -v kubens)" ]; then
+  echo "kubens found"
+else
+  sudo wget -O /usr/local/bin/kubens https://github.com/ahmetb/kubectx/releases/latest/download/kubens
+  sudo chmod +x /usr/local/bin/kubens
+fi
+
 # K9S
 if [ -x "$(command -v k9s)" ]; then
   echo "k9s found"
