@@ -25,3 +25,8 @@ options:
   kubeconfig:
     updateDefaultKubeconfig: true
     switchCurrentContext: true
+registries:
+  create:
+    name: 'registry.localhost'
+    host: '0.0.0.0'
+    hostPort: '5000'
