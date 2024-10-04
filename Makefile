@@ -3,7 +3,7 @@ DC = docker compose
 .DEFAULT_GOAL = help
 
 %:
-	# empty target
+	@echo "unknown target '$@'"
 
 ### INFO
 .PHONY: help
@@ -13,18 +13,22 @@ help: ## Help
 ### DO THIS FIRST
 .PHONY: stuff-install
 stuff-install: ## Install needed stuff
-	@cd scripts && sudo ./stuff-install.sh
+	@sudo ./stuff-install.sh
 
-### App cluster
-.PHONY: cluster-create cluster-delete cluster-list cluster-info
-cluster-create: ## Create dev-cluster
+### Cluster
+.PHONY: up
+up: ## Create dev-cluster
 	@echo "Init cluster: dev-cluster"
-	k3d cluster create --config kubernetes/cluster.yaml
+	k3d cluster create --config cluster.yaml
+	kubectl apply -f deployments/docker-registry-ui.yaml
 
-cluster-delete: ## Delete dev-cluster
+.PHONY: down
+down: ## Delete dev-cluster
 	@echo "Delete cluster: dev-cluster"
-	k3d cluster delete dev-cluster
+	kubectl delete -f deployments/docker-registry-ui.yaml
+	k3d cluster delete --config cluster.yaml
 
+### Some tools
 cluster-list: ## List dev-clusters
 	k3d cluster list
 
@@ -33,9 +37,3 @@ cluster-info: ## Check dev-cluster
 	@echo "------------------------------"
 	kubectl get pods,ingress,services --output wide
 
-### Apps
-app-docker-registry-ui-deploy:
-	kubectl apply -f deployments/docker-registry-ui.yaml
-
-app-docker-registry-ui-delete:
-	kubectl delete -f deployments/docker-registry-ui.yaml
