@@ -13,6 +13,11 @@ ports:
   - port: 80:80
     nodeFilters:
       - loadbalancer
+volumes:
+  - volume: /home/projects:/mnt/projects
+    nodeFilters:
+      - server:0
+      - agent:*
 options:
   k3d:
     wait: true
