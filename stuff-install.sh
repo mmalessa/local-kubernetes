@@ -61,3 +61,12 @@ if [ -x "$(command -v helm)" ]; then
 else
   curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
 fi
+
+# Helmfile
+if [ -x "$(command -v helmfile)" ]; then
+  echo "helmfile found"
+else
+  wget -q -O - https://github.com/helmfile/helmfile/releases/download/v1.0.0-rc.5/helmfile_1.0.0-rc.5_linux_amd64.tar.gz | tar -xzf - helmfile \
+    && chmod +x helmfile \
+    && mv helmfile /usr/local/bin/helmfile
+fi
