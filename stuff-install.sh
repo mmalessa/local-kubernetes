@@ -81,7 +81,7 @@ if [ -x "$(command -v helmfile)" ] && [ "$FORCE" = false ]; then
   echo "helmfile found"
 else
   echo "Download and install helmfile..."
-  wget -q -O - https://github.com/helmfile/helmfile/releases/download/v1.0.0-rc.5/helmfile_1.0.0-rc.5_linux_amd64.tar.gz | tar -xzf - helmfile \
+  wget -q -O - https://github.com/helmfile/helmfile/releases/download/v0.169.0/helmfile_0.169.0_linux_amd64.tar.gz | tar -xzf - helmfile \
     && chmod +x helmfile \
     && mv helmfile /usr/local/bin/helmfile
 fi
