@@ -1,0 +1,22 @@
+# helmfile.yaml
+
+helmDefaults:
+  verify: false
+  wait: true
+  timeout: 180
+  recreatePods: false
+  force: false
+  createNamespace: true
+---
+environments:
+  dev: {}
+  stg: {}
+  prod: {}
+---
+releases:
+  - name: php-sandbox
+    namespace: my-app
+    chart: ./charts/php-sandbox
+    version: "1.0.0"
+    values:
+      - values/common.yaml
