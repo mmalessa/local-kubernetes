@@ -25,9 +25,23 @@ up: ## Create dev-cluster
 .PHONY: down
 down: ## Delete dev-cluster
 	@echo "Delete cluster: dev-cluster"
-	kubectl delete -f deployments/docker-registry-ui.yaml
+	# kubectl delete -f deployments/docker-registry-ui.yaml
 	k3d cluster delete --config cluster.yaml
 
+.PHONY: tools-up
+tools-up:
+	kubectl apply -f deployments/postgres.yaml
+	kubectl apply -f deployments/kafka.yaml
+	kubectl apply -f deployments/kafka-ui.yaml
+	kubectl apply -f deployments/rabbitmq.yaml
+
+.PHONY: tools-down
+tools-down:
+	kubectl delete -f deployments/rabbitmq.yaml
+	kubectl delete -f deployments/kafka-ui.yaml
+	kubectl delete -f deployments/kafka.yaml
+	kubectl delete -f deployments/postgres.yaml
+	
 ### Some tools
 cluster-list: ## List dev-clusters
 	k3d cluster list
