@@ -20,12 +20,12 @@ stuff-install: ## Install needed stuff
 up: ## Create dev-cluster
 	@echo "Init cluster: $(K3D_CLUSTER_NAME)"
 	k3d cluster create --config cluster.yaml
-	kubectl apply -f deployments/docker-registry-ui.yaml
+# kubectl apply -f deployments/docker-registry-ui.yaml
 
 .PHONY: down
 down: ## Delete dev-cluster
 	@echo "Delete cluster: $(K3D_CLUSTER_NAME)"
-	# kubectl delete -f deployments/docker-registry-ui.yaml
+# kubectl delete -f deployments/docker-registry-ui.yaml
 	k3d cluster delete --config cluster.yaml
 
 .PHONY: tools-up
@@ -51,7 +51,7 @@ cluster-info: ## Check dev-cluster
 	@echo "------------------------------"
 	kubectl get pods,ingress,services --output wide
 
-k3d-import-image:
+k3d-import-image: ## Import docker image to K3D
 	@if [ -z "$(IMAGE)" ]; then \
 		echo "Please specify the image name using IMAGE=<name>"; \
 		exit 1; \
@@ -60,7 +60,7 @@ k3d-import-image:
 	@k3d image import $(IMAGE) -c $(K3D_CLUSTER_NAME)
 	@echo "Done."
 
-k3d-remove-image:
+k3d-remove-image: ## Delete image from K3D
 	@if [ -z "$(IMAGE)" ]; then \
 		echo "Please specify the image name using IMAGE=<name>:<tag>"; \
 		exit 1; \
@@ -72,5 +72,5 @@ k3d-remove-image:
 	done
 	@echo "Image '$(IMAGE)' removed from all cluster nodes."
 
-k3d-images-list:
+k3d-images-list: ## List images on K3D
 	@docker exec -it k3d-dev-cluster-server-0 crictl images
