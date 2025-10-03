@@ -1,9 +1,20 @@
 # Local Kubernetes
 Based on [K3D](https://k3d.io)
 
+Kubernetes Cluster running in Docker - for developer needs
+
+Just 'make up'... (almost) that's it :D
+
 See `Makefile` content ...or `make help`
 
-## Customize cluster.yaml
+## Basic commands
+```sh
+make stuff-install # install some linux stuff
+make up
+make down
+```
+
+## Customize cluster.yaml (optional)
 
 Set your local 'projects' directory
 
@@ -34,15 +45,8 @@ spec:
               type: Directory
 ```
 
-
-## Useful commands
-```sh
-make stuff-install # install some linux stuff
-make up
-make down
-```
-
 ## Access to Docker Registry UI
 ```
 http://registry-ui.localhost/
 ```
+
