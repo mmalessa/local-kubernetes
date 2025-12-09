@@ -37,7 +37,7 @@ if [ -x "$(command -v kubectx)" ] && [ "$FORCE" = false ]; then
   echo "kubectx found"
 else
   echo "Download and install kubectx..."
-  sudo curl -Lo /usr/local/bin/kubectx https://github.com/ahmetb/kubectx/releases/latest/download/kubectx
+  sudo curl --silent -Lo /usr/local/bin/kubectx https://github.com/ahmetb/kubectx/releases/latest/download/kubectx
   sudo chmod +x /usr/local/bin/kubectx
 fi
 
@@ -45,7 +45,7 @@ if [ -x "$(command -v kubens)" ] && [ "$FORCE" = false ]; then
   echo "kubens found"
 else
   echo "Download and install kubens..."
-  sudo wget -O /usr/local/bin/kubens https://github.com/ahmetb/kubectx/releases/latest/download/kubens
+  sudo wget -q -O /usr/local/bin/kubens https://github.com/ahmetb/kubectx/releases/latest/download/kubens
   sudo chmod +x /usr/local/bin/kubens
 fi
 
@@ -73,7 +73,7 @@ if [ -x "$(command -v helm)" ] && [ "$FORCE" = false ]; then
   echo "helm found"
 else
   echo "Download and install helm..."
-  curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
+  curl --silent https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
 fi
 
 # Helmfile
@@ -81,7 +81,13 @@ if [ -x "$(command -v helmfile)" ] && [ "$FORCE" = false ]; then
   echo "helmfile found"
 else
   echo "Download and install helmfile..."
-  wget -q -O - https://github.com/helmfile/helmfile/releases/download/v0.169.0/helmfile_0.169.0_linux_amd64.tar.gz | tar -xzf - helmfile \
-    && chmod +x helmfile \
-    && mv helmfile /usr/local/bin/helmfile
+  release_url=$( curl -I "https://github.com/helmfile/helmfile/releases/latest" --silent | grep location: | grep -oP 'https?://\S+' )
+  version=$(echo "$release_url" | grep -oP '\d+\.\d+\.\d+')
+  echo "Latest helmfile version: ${version}"
+
+  wget -q -O - https://github.com/helmfile/helmfile/releases/download/v${version}/helmfile_${version}_linux_amd64.tar.gz | tar -xzf - helmfile \
+  && chmod +x helmfile \
+  && mv helmfile /usr/local/bin/helmfile
 fi
+
+echo "DONE"
